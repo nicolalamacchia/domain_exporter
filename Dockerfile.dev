@@ -5,8 +5,11 @@ RUN go mod download
 ADD . .
 RUN go build -o /domain_exporter main.go
 
+FROM busybox:uclibc as busybox
+
 FROM gcr.io/distroless/base-debian12
 EXPOSE 9222
 WORKDIR /
+COPY --from=busybox /bin/sh /bin/sh
 COPY --from=builder /domain_exporter /usr/bin/domain_exporter
 ENTRYPOINT ["/usr/bin/domain_exporter"]
